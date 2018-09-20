@@ -1,7 +1,7 @@
 <?php
 
-include 'db_connetcion.php';
-include 'classes/DOMDocumentParser.php';
+include '../db_connetcion.php';
+include '../classes/DOMDocumentParser.php';
 
 
 $alreadyCrawled = [];
@@ -11,19 +11,19 @@ $alreadyFoundImages = [];
 function linkExists(string $url) : bool {
     global $connection;
 
-    $query = $connection->prepare("SELECT * FROM sites WHERE url = :u");
+    $query = $connection->prepare('SELECT * FROM sites WHERE url = :u');
 
     $query->bindParam(':u', $url);
     $query->execute();
 
-    return $query->rowCount() != 0;
+    return $query->rowCount() !== 0;
 }
 
 function insertLink(string $url, string $title, string $description, string $keywords) : bool {
     global $connection;
 
-    $query = $connection->prepare("INSERT INTO sites(url, title, description, keywords) 
-                                             VALUES (:u,:t,:d,:k)");
+    $query = $connection->prepare('INSERT INTO sites(url, title, description, keywords) 
+                                             VALUES (:u,:t,:d,:k)');
 
     $query->bindParam(':u', $url);
     $query->bindParam(':t', $title);
@@ -36,12 +36,12 @@ function insertLink(string $url, string $title, string $description, string $key
 function imageExists(string $src) : bool {
     global $connection;
 
-    $query = $connection->prepare("SELECT * FROM images WHERE imageUrl = :s");
+    $query = $connection->prepare('SELECT * FROM images WHERE imageUrl = :s');
 
     $query->bindParam(':s', $src);
     $query->execute();
 
-    return $query->rowCount() != 0;
+    return $query->rowCount() !== 0;
 }
 
 function insertImage(string $url, string $src, string $alt, string $title) : bool {
@@ -62,16 +62,16 @@ function createLink (string $src, string $url) {
     $scheme = parse_url($url)['scheme']; //http
     $host = parse_url($url)['host']; // www.adad.com
 
-    if (substr($src, 0,2) == '//') {
+    if (substr($src, 0,2) === '//') {
         $src = $scheme . ':' . $src;
-    } elseif (substr($src, 0,1) == '/') {
+    } elseif (substr($src, 0,1) === '/') {
         $src = $scheme . '://' . $host . $src;
-    } elseif (substr($src, 0,2) == './') {
+    } elseif (substr($src, 0,2) === './') {
         $path = dirname(parse_url($url)['path']);
         $src = $scheme . '://' . $host . $path . substr($src, 1);
-    } elseif (substr($src, 0,3) == '../') {
+    } elseif (substr($src, 0,3) === '../') {
         $src = $scheme . '://' . $host . '/' . $src;
-    } elseif (substr($src, 0,5) != 'https' && substr($src, 0,4) != 'http') {
+    } elseif (substr($src, 0,5) !== 'https' && substr($src, 0,4) !== 'http') {
         $src = $scheme . '://' . $host . '/' . $src;
     }
 
@@ -85,7 +85,7 @@ function getSeoData (string $url) {
 
     $title = $parser->getTitle();
 
-    if ($title == '' or is_null($title)) {
+    if ($title === '' or is_null($title)) {
         return;
     }
 
@@ -96,23 +96,23 @@ function getSeoData (string $url) {
 
     /** @var DOMElement $meta */
     foreach ($metaArray as $meta) {
-        if ($meta->getAttribute('name') == 'description') {
+        if ($meta->getAttribute('name') === 'description') {
             $description = $meta->getAttribute('content');
-            $description = str_replace("\n", "", $description);
+            $description = str_replace("\n", '', $description);
         }
 
-        if ($meta->getAttribute('name') == 'keywords') {
+        if ($meta->getAttribute('name') === 'keywords') {
             $keywords = $meta->getAttribute('content');
-            $keywords = str_replace("\n", "", $keywords);
+            $keywords = str_replace("\n", '', $keywords);
         }
     }
 
     if (linkExists($url)) {
-        echo "WARNING: $url already exists <br>";
+        echo "WARNING: $url already exists" . PHP_EOL;
     } elseif (insertLink($url, $title, $description, $keywords)) {
-        echo "SUCCESS: $url <br>";
+        echo "SUCCESS: $url" . PHP_EOL;
     } else {
-        echo "ERROR WHILE INSERTING: $url <br>";
+        echo "ERROR WHILE INSERTING: $url" . PHP_EOL;
     }
 
     $imageArray = $parser->getImages();
@@ -147,7 +147,6 @@ function followLinks(string $url) {
 
     $linkList = $parser->getLinks();
 
-    $i = 0;
     /** @var DOMElement $link */
     foreach ($linkList as $link) {
         $href = $link->getAttribute('href');
@@ -178,7 +177,7 @@ function followLinks(string $url) {
     }
 }
 
-$startUrl = "http://www.apple.com";
+$startUrl = 'http://www.yandex.ru';
 
 $t = microtime(true);
 followLinks($startUrl);
