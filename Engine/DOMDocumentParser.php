@@ -1,5 +1,8 @@
 <?php
 
+namespace Engine;
+
+use DOMDocument;
 
 class DOMDocumentParser {
     private $doc;
@@ -39,5 +42,4 @@ class DOMDocumentParser {
     public function getImages() {
         return $this->doc->getElementsByTagName('img');
     }
-
 }
