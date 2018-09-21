@@ -1,0 +1,10 @@
+{
+  "autoload": {
+    "psr-4": {
+      "Engine\\": "Engine/"
+    }
+  },
+  "require": {
+    "icanboogie/inflector": "^1.4"
+  }
+}
