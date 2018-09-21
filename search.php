@@ -1,6 +1,4 @@
 <?php
-include 'db_connetcion.php';
-
 
 if(!empty($_GET['term'])) {
     $term = $_GET['term'];
@@ -45,12 +43,12 @@ $type = !empty($_GET['type']) ? $_GET['type'] : 'sites';
         </div>
         <div class="tabsContainer">
             <ul class="tabList">
-                <li class="<?php echo $type == 'sites' ? 'active' : ''; ?>">
+                <li class="<?php echo $type === 'sites' ? 'active' : ''; ?>">
                     <a href='<?php echo "search.php?term=$term&type=sites"; ?>'>
                         Sites
                     </a>
                 </li>
-                <li class="<?php echo $type == 'images' ? 'active' : ''; ?>">
+                <li class="<?php echo $type === 'images' ? 'active' : ''; ?>">
                     <a href='<?php echo "search.php?term=$term&type=images"; ?>'>
                         Images
                     </a>
