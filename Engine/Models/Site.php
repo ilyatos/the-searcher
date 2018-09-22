@@ -4,6 +4,7 @@
 namespace Engine\Models;
 
 use Engine\BaseModel;
+use PDO;
 
 class Site extends BaseModel {
 
@@ -33,11 +34,21 @@ class Site extends BaseModel {
      *
      * @return bool
      */
-    public static function insert(string $url, string $title, string $description, string $keywords): bool {
+    public static function insertUrl(string $url): bool {
         $connection = self::getConnection();
 
-        $query = $connection->prepare('INSERT INTO sites(url, title, description, keywords) 
-                                             VALUES (:u,:t,:d,:k)');
+        $query = $connection->prepare('INSERT INTO sites(url) VALUES (:u)');
+
+        $query->bindParam(':u', $url);
+
+        return $query->execute();
+    }
+
+
+    public static function updateSeoForUrl(string $url, string $title, string $description, string $keywords): bool {
+        $connection = self::getConnection();
+
+        $query = $connection->prepare('UPDATE sites SET title=:t, description=:d, keywords=:k WHERE url=:u');
 
         $query->bindParam(':u', $url);
         $query->bindParam(':t', $title);
@@ -45,5 +56,15 @@ class Site extends BaseModel {
         $query->bindParam(':k', $keywords);
 
         return $query->execute();
+    }
+
+    public static function firstWhithoutSeo() {
+        $connection = self::getConnection();
+
+        $query = $connection->prepare('SELECT url FROM sites WHERE title IS NULL LIMIT 1');
+
+        $query->execute();
+
+        return $query->fetch(PDO::FETCH_LAZY);
     }
 }
