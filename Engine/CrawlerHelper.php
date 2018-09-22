@@ -2,18 +2,19 @@
 
 namespace Engine;
 
+use Engine\Models\Image;
+use Engine\Models\Site;
+
 class CrawlerHelper {
-    //Корень для начала индексации сайтов
     public $url;
 
     public function __construct(string $url) {
         $this->url = $url;
     }
 
-    public function createLink(string $src) {
+    public function createLink(string $src): string {
         $scheme = parse_url($this->url)['scheme']; //http
         $host = parse_url($this->url)['host']; // www.adad.com
-
 
         if (substr($src, 0, 2) === '//') {
             $src = $scheme . ':' . $src;
@@ -28,7 +29,72 @@ class CrawlerHelper {
             $src = $scheme . '://' . $host . '/' . $src;
         }
 
+        if (substr($src, -1) === '/') {
+            $src = rtrim($src, '/');
+        }
+
         return $src;
+    }
+
+    public function saveSeoData($data) {
+        /**
+         * Getting from extract().
+         *
+         * @var $title
+         * @var $description
+         * @var $keywords
+         */
+        extract($data, EXTR_SKIP);
+
+        if ($title === null) {
+            return;
+        }
+
+        Site::updateSeoForUrl($this->url, $title, $description, $keywords);
+    }
+
+    public function saveRawLinks($links) {
+        /** @var \DOMElement $link */
+        foreach ($links as $link) {
+            $href = $link->getAttribute('href');
+
+            if (strpos($href, '#') !== false) {
+                continue;
+            }
+
+            if (substr($href, 0, 11) === 'javascript:') {
+                continue;
+            }
+
+            $href = $this->createLink($href);
+
+            if (Site::exists($href)) {
+                continue;
+            }
+
+            Site::insertUrl($href);
+        }
+    }
+
+    public function saveImages($images) {
+        /** @var \DOMElement $image */
+        foreach ($images as $image) {
+            $src = $image->getAttribute('src');
+            $alt = $image->getAttribute('alt');
+            $title = $image->getAttribute('title');
+
+            if (!$alt && !$title) {
+                continue;
+            }
+
+            $src = $this->createLink($src);
+
+            if (Image::exists($src)) {
+                continue;
+            }
+
+            Image::insert($this->url, $src, $alt, $title);
+        }
     }
 
 }
