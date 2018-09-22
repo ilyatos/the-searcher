@@ -25,7 +25,7 @@ trait ConnectionTrait {
                 ];
 
                 $connection = new PDO(
-                    "mysql:dbname={$dbConfig['name']}; host={$dbConfig['host']}",
+                    "mysql:dbname={$dbConfig['name']}; host={$dbConfig['host']}; charset=utf8",
                     "{$dbConfig['username']}",
                     "{$dbConfig['password']}",
                     $options);
