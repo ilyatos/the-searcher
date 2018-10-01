@@ -3,6 +3,7 @@
 
 namespace Engine\Traits;
 
+use Engine\Config\Config;
 use PDO;
 
 trait ConnectionTrait {
@@ -16,21 +17,20 @@ trait ConnectionTrait {
         static $connection;
 
         if ($connection === null) {
-            $dbConfig = require '../config/db.php';
+            $options = [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            ];
 
             try {
-                $options = [
-                    PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING,
-                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                ];
-
                 $connection = new PDO(
-                    "mysql:dbname={$dbConfig['name']}; host={$dbConfig['host']}; charset=utf8",
-                    "{$dbConfig['username']}",
-                    "{$dbConfig['password']}",
+                    sprintf("mysql:dbname=%s; host=%s; charset=utf8", Config::DB_NAME, Config::DB_HOST),
+                    Config::DB_USER,
+                    Config::DB_PASSWORD,
                     $options);
             } catch (\PDOException $e) {
-                $e->getMessage();
+                echo $e->getMessage();
+                die;
             }
         }
 
