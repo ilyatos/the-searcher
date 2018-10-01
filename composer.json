@@ -5,6 +5,7 @@
     }
   },
   "require": {
-    "icanboogie/inflector": "^1.4"
+    "icanboogie/inflector": "^1.4",
+    "guzzlehttp/guzzle": "~6.0"
   }
 }
