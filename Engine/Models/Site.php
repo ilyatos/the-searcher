@@ -3,10 +3,10 @@
 
 namespace Engine\Models;
 
-use Engine\BaseModel;
+use Engine\Model;
 use PDO;
 
-class Site extends BaseModel {
+class Site extends Model {
 
     /**
      * @param string $url
@@ -61,7 +61,7 @@ class Site extends BaseModel {
     public static function firstWhithoutSeo() {
         $connection = self::getConnection();
 
-        $query = $connection->prepare('SELECT url FROM sites WHERE title IS NULL LIMIT 1');
+        $query = $connection->prepare('SELECT url FROM sites WHERE title IS NULL AND broken=0 LIMIT 1');
 
         $query->execute();
 

@@ -3,9 +3,9 @@
 
 namespace Engine\Models;
 
-use Engine\BaseModel;
+use Engine\Model;
 
-class Image extends BaseModel {
+class Image extends Model {
 
     /**
      * @param string $url
