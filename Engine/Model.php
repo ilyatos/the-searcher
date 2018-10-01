@@ -7,13 +7,14 @@ use Engine\Traits\ConnectionTrait;
 use ICanBoogie\Inflector;
 use ReflectionClass;
 
-abstract class BaseModel {
+abstract class Model {
     use ConnectionTrait;
 
     protected static $table;
 
     protected static function tableName() {
         if (static::$table === null) {
+
             $reflection = new ReflectionClass(static::class);
 
             $inflector = Inflector::get();
@@ -44,5 +45,23 @@ abstract class BaseModel {
         $query->execute();
 
         return $query->fetch();
+    }
+
+    public static function updateWhere(array $args, $column, $param) {
+        $connection = static::getConnection();
+
+        $sql = '';
+
+        foreach ($args as $key => $value) {
+            $sql = $sql . $key . '=' . '\'' . $value . '\'' . ',';
+        }
+
+        $sql = rtrim($sql, ',');
+
+        $query = $connection->prepare("UPDATE " . static::tableName() . " SET $sql WHERE $column=:p");
+
+        $query->bindParam(':p', $param);
+
+        return $query->execute();
     }
 }
