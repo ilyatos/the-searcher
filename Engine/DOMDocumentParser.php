@@ -3,22 +3,15 @@
 namespace Engine;
 
 use DOMDocument;
+use Engine\Exceptions\TitleNotFoundException;
 
 class DOMDocumentParser {
     private $doc;
+    private $url;
 
-    public function __construct(string $url) {
-        $options = [
-            'http' => [
-                'method' => "GET",
-                'header' => "User-Agent: searcherBot/0.1\n"
-            ],
-        ];
-
-        $context = stream_context_create($options);
-
+    public function __construct(string $html, string $url) {
+        $this->url = $url;
         $this->doc = new DOMDocument();
-        $html = file_get_contents($url, false, $context);
         @$this->doc->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
     }
 
@@ -32,6 +25,7 @@ class DOMDocumentParser {
 
     public function getSeoData() {
         $title = $this->getTitle();
+
 
         $description = '';
         $keywords = '';
@@ -62,7 +56,7 @@ class DOMDocumentParser {
         $elements = $this->doc->getElementsByTagName('title');
 
         if (sizeof($elements) == 0 || $elements->item(0) == null) {
-            return null;
+            throw new TitleNotFoundException($this->url);
         }
 
         return str_replace("\n", "", $elements->item(0)->nodeValue);
